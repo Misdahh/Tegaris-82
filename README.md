@@ -1,38 +1,24 @@
-# TEGARIS82 FIGHT
-Prototype Android 2D fighting game bertema TEGARIS82.
+# TEGARIS82 FIGHT v2.1 – GAME UI / AUDIO / OUTFIT
 
-Fitur: menu, pilih karakter, arena, HP, punch, kick, special, dan build APK via GitHub Actions.
+Update from v2.0:
+- Modern fighting-game main menu background and layout.
+- Settings menu: Music, Sound Effects, Vibration.
+- Original generated menu music loop and punch/hit/skill sound effects.
+- Outfit Garage with 5 outfit color sets: Default, Gold Fist, Mystic, Cyber, Crimson.
+- Outfit selection changes fighter appearance in-game.
+- Keeps 17 original fighters, human motion, virtual PS-style controls, mystic effects, power clash, and all arenas including MMC PONSEL Service.
+- Vibration feedback on attacks when enabled.
 
-Catatan: karakter/artwork pada prototype ini adalah karakter original. Untuk memasukkan karakter atau aset resmi Free Fire, gunakan aset yang Anda miliki hak/lisensinya.
+Build: `gradle :app:assembleDebug`
 
+## v2.2 – HUMAN-LIKE ANIMATION PASS
+- Improved procedural fighter anatomy with articulated elbows and knees, separate limb segments, joint pads, glove/boot silhouettes, facial landmarks, and subtle breathing/guard motion.
+- Attacks continue to pose the body and limbs through the existing fighting animation system.
+- Important limitation: this is still a stylized 2D Canvas fighter, not photorealistic 3D or motion-captured animation. For true lifelike characters, the project would need rigged 3D models/animations and a 3D renderer/engine.
 
-## v1.1 upgrade
-- Added TEGARIS82 logo branding in menu, character select, and result screen.
-- Expanded roster to 16 original fighters with battle-royale-inspired tactical outfits.
-- Added skill names, energy/ultimate mechanic, combo counter, damage feedback, and simple AI.
-- Characters are original designs and do not copy official Free Fire character art, names, or skins.
-
-- Added **MISDAH**, an original hacker fighter who carries a laptop and controls a small combat robot/drone.
-- Misdah skill: **HACKER BOT** — tactical remote-control theme.
-
-- v1.3: UI ditata seperti game mobile umum dengan panel, HUD, spacing, typography, arena presentation, dan branding yang lebih rapi.
-- Tampilan dibuat bergaya high-resolution/4K menggunakan bentuk Canvas yang scalable agar tetap tajam pada layar resolusi tinggi.
-
-- v1.4: Added common mobile-game back navigation: on-screen BACK button and left-edge swipe-right gesture.
-- BACK from Character Select returns to menu; BACK during a match returns to Character Select; BACK from Result returns to Character Select.
-
-- v1.5: Character visuals upgraded to a higher-detail 4K-style vector presentation with layered armor, visor/helmet details, tech plates, character-specific accents, and sharper silhouettes.
-- Skills now have visible high-resolution-style energy effects and ultimate pulse effects in the arena.
-- All character artwork remains original and vector-based for clean scaling on high-resolution displays.
-
-## v1.6 Arena Themes
-- 6 modern 4K-style vector arenas: Neon District, Cyber Lab, Desert Ruins, Ice Reactor, Sky Platform, Volcanic Core.
-- Arena is randomized for every new match.
-- Each arena has unique lighting, skyline/architecture, floor treatment, particles/shapes, and center-stage glow.
-- All arena graphics are scalable Canvas/vector-style artwork, so they remain sharp at high resolutions.
-
-
-## v1.7 MMC PONSEL Service Arena
-- Added a dedicated **MMC PONSEL SERVICE** arena themed as a modern HP/mobile-phone repair workshop.
-- Includes a glowing MMC PONSEL service sign, repair benches, phones, tools, glass/tech wall panels, and a blue service-floor grid.
-- Arena is included in the random arena rotation and uses scalable Canvas/vector-style graphics for a high-resolution/4K-style presentation.
+## v2.3 – 3D STYLE + APP ICON + PROFILE
+- Added 3D-style depth shading/highlights to procedural human fighters and avatar.
+- Added launcher application icon so Android does not show a blank/default icon.
+- Added Player Profile screen with avatar, fighter, level, fights, wins, and rank.
+- Profile stats update as matches are started and won.
+- Note: this remains a Canvas-based 2D renderer with 3D-style shading; it is not a true polygonal 3D engine/model.
