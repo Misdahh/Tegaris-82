@@ -24,7 +24,7 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Android SDK for Godot 4.3
+      - name: Install Android SDK for Godot 4.2.2
         shell: bash
         run: |
           set -euxo pipefail
@@ -49,7 +49,7 @@ jobs:
           use-dotnet: false
           include-templates: true
 
-      - name: Verify Android environment
+      - name: Verify Android 4.2.2 environment
         shell: bash
         run: |
           set -euxo pipefail
@@ -73,12 +73,12 @@ jobs:
             -keyalg RSA -keysize 2048 -validity 10000 \
             -dname "CN=Android Debug,O=Android,C=US"
 
-      - name: Configure Godot Android paths
+      - name: Configure Godot 4.2.2 Android paths
         shell: bash
         run: |
           set -euxo pipefail
           mkdir -p "$HOME/.config/godot"
-          cat > "$HOME/.config/godot/editor_settings-4.3.tres" <<EOF2
+          cat > "$HOME/.config/godot/editor_settings-4.2.tres" <<EOF2
 [gd_resource type="EditorSettings" format=3]
 
 [resource]
@@ -88,7 +88,7 @@ export/android/debug_keystore = "$HOME/.android/debug.keystore"
 export/android/debug_keystore_user = "androiddebugkey"
 export/android/debug_keystore_pass = "android"
 EOF2
-          cat "$HOME/.config/godot/editor_settings-4.3.tres"
+          cat "$HOME/.config/godot/editor_settings-4.2.tres"
 
       - name: Validate project and Android export preset
         shell: bash
