@@ -125,7 +125,7 @@ public class FightView extends View {
         button(c,getWidth()/2f,345,330,64,"PLAY NOW",0xFF18E0FF);
         button(c,getWidth()/2f,420,330,55,"CHARACTERS",0xFF263238);
         p.setTextSize(11); p.setColor(0xFF65747C);
-        c.drawText("TEGARIS82 • ORIGINAL FIGHTERS • v1.6",getWidth()/2f,510,p);
+        c.drawText("TEGARIS82 • ORIGINAL FIGHTERS • v1.7",getWidth()/2f,510,p);
     }
 
     private void drawSelect(Canvas c) {
