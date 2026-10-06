@@ -28,7 +28,10 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          sdkmanager --sdk_root="$ANDROID_HOME" \
+          SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME}}"
+          echo "SDK_ROOT=$SDK_ROOT"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          sdkmanager --sdk_root="$SDK_ROOT" \
             "platform-tools" \
             "build-tools;33.0.2" \
             "build-tools;34.0.0" \
@@ -37,11 +40,11 @@ jobs:
             "cmdline-tools;latest" \
             "cmake;3.10.2.4988404" \
             "ndk;23.2.8568313"
-          yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null || true
-          test -x "$ANDROID_HOME/build-tools/33.0.2/aapt"
-          test -x "$ANDROID_HOME/build-tools/34.0.0/aapt"
-          test -f "$ANDROID_HOME/platforms/android-33/android.jar"
-          test -f "$ANDROID_HOME/platforms/android-34/android.jar"
+          yes | sdkmanager --sdk_root="$SDK_ROOT" --licenses >/dev/null || true
+          test -x "$SDK_ROOT/build-tools/33.0.2/aapt"
+          test -x "$SDK_ROOT/build-tools/34.0.0/aapt"
+          test -f "$SDK_ROOT/platforms/android-33/android.jar"
+          test -f "$SDK_ROOT/platforms/android-34/android.jar"
 
       - name: Set up Godot 4.3
         uses: chickensoft-games/setup-godot@v2
@@ -56,13 +59,12 @@ jobs:
           set -euxo pipefail
           godot --version
           java -version
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          "$ANDROID_HOME/build-tools/33.0.2/aapt" version
-          "$ANDROID_HOME/build-tools/34.0.0/aapt" version
-          ls -la "$ANDROID_HOME/build-tools/33.0.2" | head
-          ls -la "$ANDROID_HOME/build-tools/34.0.0" | head
-          ls -la "$ANDROID_HOME/platforms/android-33/android.jar"
-          ls -la "$ANDROID_HOME/platforms/android-34/android.jar"
+          SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME}}"
+          echo "SDK_ROOT=$SDK_ROOT"
+          "$SDK_ROOT/build-tools/33.0.2/aapt" version
+          "$SDK_ROOT/build-tools/34.0.0/aapt" version
+          test -f "$SDK_ROOT/platforms/android-33/android.jar"
+          test -f "$SDK_ROOT/platforms/android-34/android.jar"
 
       - name: Create debug keystore
         shell: bash
@@ -101,21 +103,24 @@ EOF2
           test -f project.godot
           test -f export_presets.cfg
           test -f main.tscn
-          grep -E 'name="Android Debug"|gradle_build/use_gradle_build=true|gradle_build/min_sdk="23"|gradle_build/target_sdk="34"' export_presets.cfg
+          grep -E 'name="Android Debug"|gradle_build/use_gradle_build=false' export_presets.cfg
+          ! grep -q 'gradle_build/min_sdk' export_presets.cfg
+          ! grep -q 'gradle_build/target_sdk' export_presets.cfg
           godot --headless --path . --editor --quit
 
       - name: Export Android debug APK
         shell: bash
         run: |
           set -euxo pipefail
-          export GODOT_ANDROID_SDK_PATH="$ANDROID_HOME"
+          export GODOT_ANDROID_SDK_PATH="${ANDROID_SDK_ROOT:-${ANDROID_HOME}}"
           export GODOT_ANDROID_JAVA_SDK_PATH="$JAVA_HOME"
           export GODOT_ANDROID_KEYSTORE_DEBUG_PATH="$HOME/.android/debug.keystore"
           export GODOT_ANDROID_KEYSTORE_DEBUG_USER="androiddebugkey"
           export GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD="android"
           mkdir -p build/android
           echo "SDK: $GODOT_ANDROID_SDK_PATH"
-          ls -d "$ANDROID_HOME/platforms/android-33" "$ANDROID_HOME/build-tools/33.0.2" "$ANDROID_HOME/platforms/android-34" "$ANDROID_HOME/build-tools/34.0.0"
+          ls -d "$GODOT_ANDROID_SDK_PATH/platforms/android-33" "$GODOT_ANDROID_SDK_PATH/build-tools/33.0.2"
+          ls -d "$GODOT_ANDROID_SDK_PATH/platforms/android-34" "$GODOT_ANDROID_SDK_PATH/build-tools/34.0.0"
           godot --headless --path . --verbose --export-debug "Android Debug" build/android/TEGARIS82-FIGHT-debug.apk
           test -s build/android/TEGARIS82-FIGHT-debug.apk
           ls -lh build/android/TEGARIS82-FIGHT-debug.apk
