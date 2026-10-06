@@ -18,7 +18,10 @@ jobs:
           java-version: '17'
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+  uses: android-actions/setup-android@v4
+  with:
+    cmdline-tools-version: '14742923'
+    accept-android-sdk-licenses: true
 
       - name: Install Android SDK 33
         shell: bash
