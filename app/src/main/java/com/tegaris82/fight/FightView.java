@@ -82,6 +82,22 @@ public class FightView extends View {
         p.setStyle(Paint.Style.FILL);
     }
 
+    private void backButton(Canvas c) {
+        p.setStyle(Paint.Style.FILL);
+        p.setColor(0xCC101820);
+        c.drawRoundRect(18, 70, 150, 122, 14, 14, p);
+        p.setStyle(Paint.Style.STROKE);
+        p.setStrokeWidth(2);
+        p.setColor(0x6638D9FF);
+        c.drawRoundRect(18, 70, 150, 122, 14, 14, p);
+        p.setStyle(Paint.Style.FILL);
+        p.setTextAlign(Paint.Align.CENTER);
+        p.setTextSize(15);
+        p.setColor(Color.WHITE);
+        c.drawText("← BACK", 84, 103, p);
+        p.setTextAlign(Paint.Align.LEFT);
+    }
+
     private void bg(Canvas c, int color) {
         c.drawColor(color);
         p.setStyle(Paint.Style.FILL);
