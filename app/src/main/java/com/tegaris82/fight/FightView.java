@@ -55,7 +55,7 @@ public class FightView extends View {
     private float clashX = 0, clashY = 0;
     private int clashColor = 0xFFFFC107;
     private long playerHitStunUntil = 0, enemyHitStunUntil = 0;
-    private final String[] arenaNames = {"NEON DISTRICT", "CYBER LAB", "DESERT RUINS", "ICE REACTOR", "SKY PLATFORM", "VOLCANIC CORE", "MMC PONSEL SERVICE"};
+    private final String[] arenaNames = {"TEGARIS82 TEMPLE", "NEON DISTRICT", "CYBER LAB", "DESERT RUINS", "ICE REACTOR", "SKY PLATFORM", "VOLCANIC CORE", "MMC PONSEL SERVICE"};
     private final CharacterInfo[] chars = new CharacterInfo[] {
         new CharacterInfo("GARIS", "RUSH", 0xFF18E0FF, 0xFF17202A),
         new CharacterInfo("TEGA", "IRON FIST", 0xFFFFC107, 0xFF263238),
@@ -187,29 +187,89 @@ public class FightView extends View {
     }
 
     private void drawMenu(Canvas c) {
-        // Modern fighting-game home screen: layered lights, stage silhouettes and clear cards.
-        c.drawColor(0xFF05080D);
+        // Premium martial-arts title screen inspired by the supplied reference:
+        // dark temple, giant guardian silhouette, dramatic lightning and large TEGARIS82 branding.
+        float w=getWidth(), h=getHeight();
+        c.drawColor(0xFF05070B);
         p.setStyle(Paint.Style.FILL);
-        p.setColor(0xFF0C1720); c.drawRect(0,0,getWidth(),getHeight(),p);
-        p.setColor(0x2218E0FF); c.drawCircle(getWidth()*0.18f,190,180,p);
-        p.setColor(0x2218E0FF); c.drawCircle(getWidth()*0.84f,250,240,p);
-        for(int i=0;i<9;i++){ float bx=i*95-30; float bh=80+(i%4)*48; p.setColor(0xFF101B23); c.drawRect(bx,235-bh,bx+70,235,p); }
-        p.setColor(0xFF0A1117); c.drawRect(0,235,getWidth(),getHeight(),p);
-        p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(2); p.setColor(0x332DD9FF);
-        for(int i=0;i<10;i++) c.drawLine(i*getWidth()/10f,235,getWidth()/2f+(i-5)*90,getHeight(),p);
+        p.setColor(0xFF090B12); c.drawRect(0,0,w,h,p);
+
+        // Deep temple columns / ceiling.
+        p.setColor(0xFF15141A); c.drawRect(0,0,w,h*0.60f,p);
+        p.setColor(0xFF24202A);
+        c.drawRect(0,0,34,h,p); c.drawRect(w-34,0,w,h,p);
+        for(int i=0;i<7;i++){
+            float x=i*w/6f;
+            p.setColor(0xFF1A1820);
+            c.drawRect(x-10,72,x+10,h*0.60f,p);
+            p.setColor(0xFF332D35);
+            c.drawRect(x-3,80,x+4,h*0.60f,p);
+        }
+
+        // Guardian statue silhouette in the back — original abstract statue, not a copied character.
+        float sx=w/2f, sy=h*0.46f;
+        p.setColor(0xFF4A3E35); c.drawRoundRect(sx-78,sy-130,sx+78,sy+55,42,42,p);
+        p.setColor(0xFF625247); c.drawCircle(sx,sy-165,62,p);
+        p.setColor(0xFF2C2522); c.drawArc(sx-74,sy-218,sx+74,sy-100,180,180,true,p);
+        p.setColor(0xFF8A735D);
+        c.drawCircle(sx-20,sy-170,7,p); c.drawCircle(sx+20,sy-170,7,p);
+        p.setColor(0xFF332A25); c.drawRoundRect(sx-95,sy-105,sx-45,sy+30,22,22,p);
+        c.drawRoundRect(sx+45,sy-105,sx+95,sy+30,22,22,p);
+        p.setColor(0xFF715E4C); c.drawRect(sx-18,sy-80,sx+18,sy+20,p);
+        p.setColor(0xFF9D815F); c.drawCircle(sx,sy-50,9,p);
+
+        // Dramatic cyan/magenta lightning behind the logo.
+        p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(4);
+        p.setColor(0xAA18E0FF);
+        Path bolt1=new Path(); bolt1.moveTo(50,75); bolt1.lineTo(120,105); bolt1.lineTo(92,130); bolt1.lineTo(210,160); c.drawPath(bolt1,p);
+        p.setColor(0xAAFF4B9B);
+        Path bolt2=new Path(); bolt2.moveTo(w-50,78); bolt2.lineTo(w-135,112); bolt2.lineTo(w-102,138); bolt2.lineTo(w-230,166); c.drawPath(bolt2,p);
         p.setStyle(Paint.Style.FILL);
-        drawCornerDecor(c); logo(c,getWidth()/2f,105,0.9f);
-        p.setTextAlign(Paint.Align.CENTER); p.setTextSize(13); p.setColor(0xFF9EABB5);
-        c.drawText("MOBILE 1V1 • MARTIAL ARTS • SEASON 01",getWidth()/2f,164,p);
-        panel(c,getWidth()/2f-250,195,getWidth()/2f+250,470,0xE6111820,0xFF2B3D48,24);
-        p.setTextSize(28); p.setColor(Color.WHITE); c.drawText("BATTLE ARENA",getWidth()/2f,238,p);
-        p.setTextSize(12); p.setColor(0xFF82939D); c.drawText("FIGHT • MYSTIC SKILLS • POWER CLASH",getWidth()/2f,262,p);
-        button(c,getWidth()/2f,318,330,58,"PLAY NOW",0xFF18E0FF);
-        button(c,getWidth()/2f-88,390,160,50,"CHARACTERS",0xFF263640);
-        button(c,getWidth()/2f+88,390,160,50,"OUTFITS",0xFF263640);
-        button(c,getWidth()/2f,450,160,50,"SETTINGS",0xFF18242B);
-        button(c,getWidth()/2f+88,450,160,50,"PROFILE",0xFF18242B);
-        p.setTextSize(10); p.setColor(0xFF64757F); c.drawText("MMC PONSEL SERVICE ARENA • 17 ORIGINAL FIGHTERS",getWidth()/2f,510,p);
+
+        // Large TEGARIS82 background wordmark.
+        p.setTextAlign(Paint.Align.CENTER);
+        p.setTypeface(Typeface.create("sans-serif-black",Typeface.BOLD));
+        p.setTextSize(Math.min(w*0.105f,92));
+        p.setColor(0x3318E0FF);
+        c.drawText("TEGARIS82",sx,105,p);
+        p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(2);
+        p.setColor(0x6618E0FF);
+        c.drawText("TEGARIS82",sx,105,p);
+        p.setStyle(Paint.Style.FILL);
+
+        // Temple floor and central fighting circle.
+        p.setColor(0xFF0C1016); c.drawRect(0,h*0.60f,w,h,p);
+        p.setColor(0xFF232A31); c.drawRect(0,h*0.60f,w,h*0.61f,p);
+        p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(2); p.setColor(0x3338D9FF);
+        for(int i=0;i<11;i++) c.drawLine(i*w/10f,h*0.60f,w/2f+(i-5)*110,h,p);
+        c.drawCircle(sx,h*0.72f,145,p);
+        c.drawCircle(sx,h*0.72f,112,p);
+        p.setStyle(Paint.Style.FILL);
+
+        // Small original fighter silhouettes at the sides.
+        drawMiniFighter(c,w*0.16f,h*0.72f,chars[0],0.62f,true);
+        drawMiniFighter(c,w*0.84f,h*0.72f,chars[2],0.62f,false);
+
+        // Main menu card with larger, cleaner typography.
+        panel(c,w/2f-285,155,w/2f+285,555,0xE90A1119,0xFF344955,28);
+        p.setTypeface(Typeface.create("sans-serif-black",Typeface.BOLD));
+        p.setTextAlign(Paint.Align.CENTER); p.setTextSize(Math.min(w*0.065f,56));
+        p.setColor(Color.WHITE); c.drawText("TEGARIS82",w/2f,215,p);
+        p.setTextSize(17); p.setColor(0xFF18E0FF);
+        c.drawText("FIGHT ARENA",w/2f,242,p);
+        p.setTypeface(Typeface.create("sans-serif",Typeface.BOLD));
+        p.setTextSize(13); p.setColor(0xFFB5C3CA);
+        c.drawText("MOBILE 1V1  •  MARTIAL ARTS  •  SEASON 01",w/2f,268,p);
+
+        button(c,w/2f,325,390,66,"PLAY NOW",0xFF18E0FF);
+        button(c,w/2f-105,405,200,56,"CHARACTERS",0xFF263640);
+        button(c,w/2f+105,405,200,56,"OUTFITS",0xFF263640);
+        button(c,w/2f-105,478,200,56,"SETTINGS",0xFF18242B);
+        button(c,w/2f+105,478,200,56,"PROFILE",0xFF18242B);
+
+        p.setTypeface(Typeface.create("sans-serif",Typeface.BOLD));
+        p.setTextSize(11); p.setColor(0xFF7E929C);
+        c.drawText("TEMPLE ARENA • 17 ORIGINAL FIGHTERS • MYSTIC SKILLS",w/2f,535,p);
     }
 
     private void drawSelect(Canvas c) {
@@ -217,7 +277,7 @@ public class FightView extends View {
         backButton(c);
         drawCornerDecor(c);
         topBrand(c);
-        p.setTextAlign(Paint.Align.CENTER); p.setColor(Color.WHITE); p.setTextSize(24);
+        p.setTextAlign(Paint.Align.CENTER); p.setColor(Color.WHITE); p.setTextSize(28);
         c.drawText("SELECT FIGHTER",getWidth()/2f,92,p);
         p.setTextSize(11); p.setColor(0xFF7E8D96);
         c.drawText("17 ORIGINAL OPERATORS • TAP TO SELECT",getWidth()/2f,111,p);
@@ -229,7 +289,7 @@ public class FightView extends View {
             panel(c,x,y,x+cardW,y+cardH, i==selected?0xFF152A32:0xFF10171D,
                     i==selected?chars[i].accent:0xFF2B3740,12);
             drawMiniFighter(c,x+cardW/2,y+63,chars[i],0.82f,false);
-            p.setTextAlign(Paint.Align.CENTER); p.setTextSize(15); p.setColor(Color.WHITE);
+            p.setTextAlign(Paint.Align.CENTER); p.setTextSize(17); p.setColor(Color.WHITE);
             c.drawText(chars[i].name,x+cardW/2,y+120,p);
             p.setTextSize(8); p.setColor(0xFF7E8D96);
             c.drawText("SKILL",x+cardW/2,y+133,p);
@@ -410,10 +470,50 @@ public class FightView extends View {
 
     private void drawArena(Canvas c) {
         float w=getWidth(), h=getHeight(), floor=h*0.58f;
-        int[] bases={0xFF07121A,0xFF091018,0xFF24170E,0xFF0A1720,0xFF111225,0xFF1D0D0A,0xFF10151A};
+        int[] bases={0xFF100D0E,0xFF07121A,0xFF091018,0xFF24170E,0xFF0A1720,0xFF111225,0xFF1D0D0A,0xFF10151A};
         c.drawColor(bases[arena]);
         p.setStyle(Paint.Style.FILL);
         if(arena==0) {
+            // TEGARIS82 TEMPLE — dramatic martial-arts arena with guardian statue.
+            p.setColor(0xFF171319); c.drawRect(0,125,w,floor,p);
+            // Ceiling beams.
+            p.setColor(0xFF2C252B);
+            for(int i=0;i<7;i++) c.drawRect(i*w/6f-7,125,i*w/6f+7,floor,p);
+            // Pillars.
+            for(int side=0;side<2;side++) {
+                float px=side==0?42:w-42;
+                p.setColor(0xFF5B4A3B); c.drawRect(px-22,135,px+22,floor,p);
+                p.setColor(0xFF8B7054); c.drawRect(px-9,145,px+9,floor,p);
+                p.setColor(0xFF3A3029); c.drawRect(px-30,132,px+30,148,p);
+            }
+            // Giant guardian statue.
+            float sx=w/2f, sy=floor-90;
+            p.setColor(0xFF4B4036); c.drawRoundRect(sx-96,sy-160,sx+96,sy+35,48,48,p);
+            p.setColor(0xFF655446); c.drawCircle(sx,sy-200,76,p);
+            p.setColor(0xFF2C2622); c.drawArc(sx-90,sy-260,sx+90,sy-120,180,180,true,p);
+            p.setColor(0xFF8D7357); c.drawCircle(sx-24,sy-204,8,p); c.drawCircle(sx+24,sy-204,8,p);
+            p.setColor(0xFF75604D); c.drawRect(sx-20,sy-118,sx+20,sy+10,p);
+            p.setColor(0xFF3B312A); c.drawRoundRect(sx-125,sy-130,sx-62,sy+28,28,28,p); c.drawRoundRect(sx+62,sy-130,sx+125,sy+28,28,28,p);
+            // Backlit halo and lightning.
+            p.setColor(0x3338D9FF); c.drawCircle(sx,sy-115,190,p);
+            p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(4); p.setColor(0xAA18E0FF);
+            Path l=new Path(); l.moveTo(65,165); l.lineTo(130,195); l.lineTo(100,220); l.lineTo(220,245); c.drawPath(l,p);
+            p.setColor(0xAAFF4B9B);
+            Path r=new Path(); r.moveTo(w-65,165); r.lineTo(w-130,195); r.lineTo(w-100,220); r.lineTo(w-220,245); c.drawPath(r,p);
+            p.setStyle(Paint.Style.FILL);
+            // Temple sign.
+            p.setColor(0xDD0A1015); c.drawRoundRect(w/2f-190,145,w/2f+190,190,12,12,p);
+            p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(2); p.setColor(0xFF18E0FF); c.drawRoundRect(w/2f-190,145,w/2f+190,190,12,12,p);
+            p.setStyle(Paint.Style.FILL); p.setTextAlign(Paint.Align.CENTER); p.setTextSize(20); p.setColor(Color.WHITE);
+            c.drawText("TEGARIS82 TEMPLE",w/2f,174,p);
+            // Stone fighting floor.
+            p.setColor(0xFF20252B); c.drawRect(0,floor,w,h,p);
+            p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(2); p.setColor(0x4438D9FF);
+            c.drawCircle(w/2f,floor+18,220,p); c.drawCircle(w/2f,floor+18,155,p);
+            for(int i=0;i<12;i++) c.drawLine(i*w/11f,floor,w/2f+(i-5.5f)*105,h,p);
+            for(int i=0;i<4;i++) c.drawLine(0,floor+35+i*55,w,floor+35+i*55,p);
+            p.setStyle(Paint.Style.FILL);
+        } else if(arena==1) {
             // Neon city skyline
             p.setColor(0xFF0C1822); c.drawRect(0,150,w,floor,p);
             for(int i=0;i<9;i++){ float bx=i*w/8f; float bh=90+(i%4)*55; p.setColor(0xFF132734); c.drawRect(bx,floor-150-bh,bx+w/9f,floor,p); }
@@ -421,7 +521,7 @@ public class FightView extends View {
             p.setColor(0xFF101D25); c.drawRect(0,floor,w,h,p);
             p.setColor(0x3318E0FF); c.drawCircle(w/2,floor-45,210,p);
             p.setColor(0xFF1D3440); for(int i=0;i<12;i++) c.drawRect(i*w/12f,floor+35,i*w/12f+2,h,p);
-        } else if(arena==1) {
+        } else if(arena==2) {
             // Futuristic laboratory
             p.setColor(0xFF10242B); c.drawRect(0,145,w,floor,p);
             p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(3); p.setColor(0x553FE8FF);
@@ -430,14 +530,14 @@ public class FightView extends View {
             p.setStyle(Paint.Style.FILL); p.setColor(0xFF152F37); c.drawRect(0,floor,w,h,p);
             p.setColor(0x443FE8FF); c.drawCircle(w/2,floor-30,180,p);
             p.setColor(0xFF2B515B); for(int i=0;i<8;i++) c.drawRect(i*w/8f,floor+15,i*w/8f+3,h,p);
-        } else if(arena==2) {
+        } else if(arena==3) {
             // Desert ruins
             p.setColor(0xFF5A321C); c.drawRect(0,185,w,floor,p);
             p.setColor(0xFF8D5630); for(int i=0;i<7;i++){float bx=i*175-30; c.drawRect(bx,floor-170-(i%2)*50,bx+100,floor,p);}
             p.setColor(0xFF6E4026); c.drawRect(0,floor,w,h,p);
             p.setColor(0x443C2011); for(int i=0;i<12;i++) c.drawCircle((i*117)%((int)w),floor+25+(i%3)*55,18+(i%4)*7,p);
             p.setColor(0x66FFD08A); c.drawCircle(w*0.76f,175,58,p);
-        } else if(arena==3) {
+        } else if(arena==4) {
             // Ice reactor
             p.setColor(0xFF102B3A); c.drawRect(0,145,w,floor,p);
             p.setColor(0xFF7FE8FF); p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(2);
@@ -445,14 +545,14 @@ public class FightView extends View {
             p.setStyle(Paint.Style.FILL); p.setColor(0xFF183C4A); c.drawRect(0,floor,w,h,p);
             p.setColor(0x553CE8FF); c.drawCircle(w/2,floor-40,220,p);
             p.setColor(0xFFB8F5FF); for(int i=0;i<9;i++) c.drawCircle(45+i*130,floor+25+(i%2)*55,4,p);
-        } else if(arena==4) {
+        } else if(arena==5) {
             // Sky platform
             p.setColor(0xFF18244A); c.drawRect(0,130,w,floor,p);
             p.setColor(0xFF4C6FA8); c.drawCircle(w*0.18f,180,52,p); c.drawCircle(w*0.78f,205,70,p);
             p.setColor(0xFF1B2338); c.drawRect(0,floor,w,h,p);
             p.setColor(0xFF6D7FA6); for(int i=0;i<11;i++) c.drawRect(i*w/10f,floor+5,i*w/10f+2,h,p);
             p.setColor(0x4438C8FF); c.drawCircle(w/2,floor-20,200,p);
-        } else if(arena==5) {
+        } else if(arena==6) {
             // Volcanic core
             p.setColor(0xFF32130D); c.drawRect(0,145,w,floor,p);
             p.setColor(0xFF7A2414); for(int i=0;i<8;i++) c.drawRect(i*160-40,floor-120-(i%3)*35,i*160+90,floor,p);
@@ -562,6 +662,7 @@ public class FightView extends View {
 
     private void drawFighter(Canvas c,float x,float y,CharacterInfo ch,boolean facingRight,int pose) {
         drawAnimatedHuman(c,x,y,ch,1.65f,facingRight,pose);
+        drawMartialOutfit(c,x,y,ch,1.65f,facingRight);
         if ("MISDAH".equals(ch.name)) drawMisdahGear(c,x,y,1.15f,facingRight);
         drawCharacterDetails(c,x,y,ch,1.65f,facingRight);
     }
@@ -669,6 +770,71 @@ public class FightView extends View {
         p.setStyle(Paint.Style.STROKE); p.setStrokeCap(Paint.Cap.ROUND); p.setStrokeWidth(width); p.setColor(color);
         c.drawLine(x1,y1,x2,y2,p);
         p.setStyle(Paint.Style.FILL);
+    }
+
+    private void drawMartialOutfit(Canvas c,float x,float y,CharacterInfo ch,float s,boolean right) {
+        // More human / martial-arts silhouettes inspired by the supplied reference:
+        // tactical jacket + light pants for GARIS/TEGA, and long purple combat tunic for
+        // KIRA/MIRA/NOVA. All shapes are original procedural artwork.
+        boolean street=("GARIS".equals(ch.name) || "TEGA".equals(ch.name) ||
+                        "SHADOW".equals(ch.name) || "ZERO".equals(ch.name));
+        boolean longTunic=("KIRA".equals(ch.name) || "MIRA".equals(ch.name) ||
+                           "NOVA".equals(ch.name));
+
+        p.setStyle(Paint.Style.FILL);
+        if(street) {
+            // Black leather-style jacket.
+            p.setColor(0xFF171A1F);
+            Path jacket=new Path();
+            jacket.moveTo(x-39*s,y-178*s); jacket.lineTo(x+39*s,y-178*s);
+            jacket.lineTo(x+31*s,y-105*s); jacket.lineTo(x+9*s,y-96*s);
+            jacket.lineTo(x-9*s,y-96*s); jacket.lineTo(x-31*s,y-105*s); jacket.close();
+            c.drawPath(jacket,p);
+            p.setColor(0xFF343A40);
+            c.drawRoundRect(x-7*s,y-172*s,x+7*s,y-110*s,5*s,5*s,p);
+            // Light fighting pants with folds.
+            p.setColor(0xFFD5D8DA);
+            c.drawRoundRect(x-28*s,y-104*s,x-3*s,y-5*s,8*s,8*s,p);
+            c.drawRoundRect(x+3*s,y-104*s,x+28*s,y-5*s,8*s,8*s,p);
+            p.setColor(0xFF8B9499);
+            p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(2*s);
+            c.drawLine(x-21*s,y-95*s,x-12*s,y-30*s,p); c.drawLine(x+21*s,y-95*s,x+12*s,y-30*s,p);
+            p.setStyle(Paint.Style.FILL);
+            // Belt.
+            p.setColor(ch.accent); c.drawRect(x-31*s,y-111*s,x+31*s,y-101*s,p);
+            // Jacket lapels.
+            p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(3*s); p.setColor(0xFF626A70);
+            Path lapel=new Path(); lapel.moveTo(x-26*s,y-169*s); lapel.lineTo(x-5*s,y-132*s); lapel.lineTo(x-18*s,y-111*s); c.drawPath(lapel,p);
+            Path lapel2=new Path(); lapel2.moveTo(x+26*s,y-169*s); lapel2.lineTo(x+5*s,y-132*s); lapel2.lineTo(x+18*s,y-111*s); c.drawPath(lapel2,p);
+            p.setStyle(Paint.Style.FILL);
+        } else if(longTunic) {
+            // Long satin-like combat tunic / dress silhouette.
+            p.setColor(0xFF7A2D9E);
+            Path tunic=new Path();
+            tunic.moveTo(x-36*s,y-178*s); tunic.lineTo(x+36*s,y-178*s);
+            tunic.lineTo(x+52*s,y-28*s); tunic.lineTo(x+18*s,y-6*s);
+            tunic.lineTo(x,y-34*s); tunic.lineTo(x-18*s,y-6*s);
+            tunic.lineTo(x-52*s,y-28*s); tunic.close();
+            c.drawPath(tunic,p);
+            p.setColor(0xFFB75DDA);
+            c.drawRoundRect(x-28*s,y-174*s,x+28*s,y-106*s,12*s,12*s,p);
+            p.setColor(0xFFE3A7F4);
+            p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(3*s);
+            c.drawLine(x,y-170*s,x,y-42*s,p);
+            c.drawLine(x-42*s,y-36*s,x+42*s,y-36*s,p);
+            p.setStyle(Paint.Style.FILL);
+            // Decorative silver hem.
+            p.setColor(0xFFD7D8E2);
+            c.drawRect(x-50*s,y-31*s,x-18*s,y-22*s,p);
+            c.drawRect(x+18*s,y-31*s,x+50*s,y-22*s,p);
+            // Waist sash.
+            p.setColor(ch.accent); c.drawRect(x-38*s,y-111*s,x+38*s,y-100*s,p);
+        }
+        // Wrist wraps / martial gloves.
+        p.setColor(ch.accent);
+        c.drawRoundRect(x+(right?48:-64)*s,y-125*s,x+(right?67:-45)*s,y-112*s,5*s,5*s,p);
+        p.setColor(0xFF11151A);
+        c.drawCircle(x+(right?67:-67)*s,y-112*s,10*s,p);
     }
 
     private void drawCharacterDetails(Canvas c,float x,float y,CharacterInfo ch,float s,boolean facingRight) {
@@ -814,8 +980,8 @@ public class FightView extends View {
         p.setColor(color); c.drawRoundRect(cx-w/2,cy-h/2,cx+w/2,cy+h/2,12,12,p);
         p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(2); p.setColor(0x99FFFFFF);
         c.drawRoundRect(cx-w/2,cy-h/2,cx+w/2,cy+h/2,12,12,p);
-        p.setStyle(Paint.Style.FILL); p.setTextAlign(Paint.Align.CENTER); p.setTextSize(15); p.setColor(Color.WHITE);
-        c.drawText(label,cx,cy+5,p);
+        p.setStyle(Paint.Style.FILL); p.setTextAlign(Paint.Align.CENTER); p.setTextSize(17); p.setColor(Color.WHITE);
+        c.drawText(label,cx,cy+6,p);
     }
 
     private void drawSettings(Canvas c) {
@@ -963,11 +1129,11 @@ public class FightView extends View {
         }
 
         if(screen==0) {
-            if(y>285 && y<350) { screen=1; }
-            else if(y>365 && y<420 && x<getWidth()/2f) { screen=1; }
-            else if(y>365 && y<420 && x>=getWidth()/2f) { screen=5; }
-            else if(y>425 && y<490 && x<getWidth()/2f+8) { screen=4; }
-            else if(y>425 && y<490 && x>=getWidth()/2f+8) { screen=6; }
+            if(y>290 && y<360) { screen=1; }
+            else if(y>375 && y<435 && x<getWidth()/2f) { screen=1; }
+            else if(y>375 && y<435 && x>=getWidth()/2f) { screen=5; }
+            else if(y>448 && y<510 && x<getWidth()/2f) { screen=4; }
+            else if(y>448 && y<510 && x>=getWidth()/2f) { screen=6; }
         } else if(screen==1) {
             int cols=4, cardW=150, gap=14;
             float total=cols*cardW+(cols-1)*gap, left=(getWidth()-total)/2f;
