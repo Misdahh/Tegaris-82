@@ -34,22 +34,18 @@ jobs:
           sdkmanager --sdk_root="$SDK_ROOT" \
             "platform-tools" \
             "build-tools;33.0.2" \
-            "build-tools;34.0.0" \
             "platforms;android-33" \
-            "platforms;android-34" \
             "cmdline-tools;latest" \
             "cmake;3.10.2.4988404" \
             "ndk;23.2.8568313"
           yes | sdkmanager --sdk_root="$SDK_ROOT" --licenses >/dev/null || true
           test -x "$SDK_ROOT/build-tools/33.0.2/aapt"
-          test -x "$SDK_ROOT/build-tools/34.0.0/aapt"
           test -f "$SDK_ROOT/platforms/android-33/android.jar"
-          test -f "$SDK_ROOT/platforms/android-34/android.jar"
 
       - name: Set up Godot 4.3
         uses: chickensoft-games/setup-godot@v2
         with:
-          version: 4.3.0
+          version: 4.2.2
           use-dotnet: false
           include-templates: true
 
@@ -62,9 +58,7 @@ jobs:
           SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME}}"
           echo "SDK_ROOT=$SDK_ROOT"
           "$SDK_ROOT/build-tools/33.0.2/aapt" version
-          "$SDK_ROOT/build-tools/34.0.0/aapt" version
           test -f "$SDK_ROOT/platforms/android-33/android.jar"
-          test -f "$SDK_ROOT/platforms/android-34/android.jar"
 
       - name: Create debug keystore
         shell: bash
@@ -120,7 +114,6 @@ EOF2
           mkdir -p build/android
           echo "SDK: $GODOT_ANDROID_SDK_PATH"
           ls -d "$GODOT_ANDROID_SDK_PATH/platforms/android-33" "$GODOT_ANDROID_SDK_PATH/build-tools/33.0.2"
-          ls -d "$GODOT_ANDROID_SDK_PATH/platforms/android-34" "$GODOT_ANDROID_SDK_PATH/build-tools/34.0.0"
           godot --headless --path . --verbose --export-debug "Android Debug" build/android/TEGARIS82-FIGHT-debug.apk
           test -s build/android/TEGARIS82-FIGHT-debug.apk
           ls -lh build/android/TEGARIS82-FIGHT-debug.apk
