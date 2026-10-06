@@ -24,9 +24,20 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Android SDK packages
+      - name: Install exact Android SDK for Godot 4.3
+        shell: bash
         run: |
-          sdkmanager "platform-tools" "build-tools;33.0.2" "platforms;android-33" "cmdline-tools;latest" "cmake;3.10.2.4988404" "ndk;23.2.8568313"
+          set -euxo pipefail
+          sdkmanager --sdk_root="$ANDROID_HOME" \
+            "platform-tools" \
+            "build-tools;33.0.2" \
+            "platforms;android-33" \
+            "cmdline-tools;latest" \
+            "cmake;3.10.2.4988404" \
+            "ndk;23.2.8568313"
+          yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null || true
+          test -x "$ANDROID_HOME/build-tools/33.0.2/aapt"
+          test -f "$ANDROID_HOME/platforms/android-33/android.jar"
 
       - name: Set up Godot 4.3
         uses: chickensoft-games/setup-godot@v2
@@ -35,14 +46,21 @@ jobs:
           use-dotnet: false
           include-templates: true
 
-      - name: Verify tools
+      - name: Verify Android environment
+        shell: bash
         run: |
+          set -euxo pipefail
           godot --version
           java -version
-          sdkmanager --list_installed | grep -E 'platforms;android-33|build-tools;33.0.2|ndk;23.2.8568313' || true
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          "$ANDROID_HOME/build-tools/33.0.2/aapt" version
+          ls -la "$ANDROID_HOME/build-tools/33.0.2" | head
+          ls -la "$ANDROID_HOME/platforms/android-33/android.jar"
 
       - name: Create debug keystore
+        shell: bash
         run: |
+          set -euxo pipefail
           mkdir -p "$HOME/.android"
           keytool -genkeypair -v \
             -keystore "$HOME/.android/debug.keystore" \
@@ -53,9 +71,11 @@ jobs:
             -dname "CN=Android Debug,O=Android,C=US"
 
       - name: Configure Godot Android paths
+        shell: bash
         run: |
+          set -euxo pipefail
           mkdir -p "$HOME/.config/godot"
-          cat > "$HOME/.config/godot/editor_settings-4.3.tres" <<EOF
+          cat > "$HOME/.config/godot/editor_settings-4.3.tres" <<EOF2
 [gd_resource type="EditorSettings" format=3]
 
 [resource]
@@ -64,18 +84,23 @@ export/android/android_sdk_path = "$ANDROID_HOME"
 export/android/debug_keystore = "$HOME/.android/debug.keystore"
 export/android/debug_keystore_user = "androiddebugkey"
 export/android/debug_keystore_pass = "android"
-export/android/force_system_user = false
-EOF
+EOF2
+          cat "$HOME/.config/godot/editor_settings-4.3.tres"
 
-      - name: Validate project
+      - name: Validate project and Android export preset
+        shell: bash
         run: |
+          set -euxo pipefail
           test -f project.godot
           test -f export_presets.cfg
           test -f main.tscn
+          grep -E 'name="Android Debug"|gradle_build/use_gradle_build=false' export_presets.cfg
           godot --headless --path . --editor --quit
 
       - name: Export Android debug APK
+        shell: bash
         run: |
+          set -euxo pipefail
           mkdir -p build/android
           godot --headless --path . --verbose --export-debug "Android Debug" build/android/TEGARIS82-FIGHT-debug.apk
           test -s build/android/TEGARIS82-FIGHT-debug.apk
