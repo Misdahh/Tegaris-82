@@ -30,13 +30,17 @@ jobs:
           set -euxo pipefail
           sdkmanager --sdk_root="$ANDROID_HOME" \
             "platform-tools" \
+            "build-tools;33.0.2" \
             "build-tools;34.0.0" \
+            "platforms;android-33" \
             "platforms;android-34" \
             "cmdline-tools;latest" \
             "cmake;3.10.2.4988404" \
             "ndk;23.2.8568313"
           yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null || true
+          test -x "$ANDROID_HOME/build-tools/33.0.2/aapt"
           test -x "$ANDROID_HOME/build-tools/34.0.0/aapt"
+          test -f "$ANDROID_HOME/platforms/android-33/android.jar"
           test -f "$ANDROID_HOME/platforms/android-34/android.jar"
 
       - name: Set up Godot 4.3
@@ -53,8 +57,11 @@ jobs:
           godot --version
           java -version
           echo "ANDROID_HOME=$ANDROID_HOME"
+          "$ANDROID_HOME/build-tools/33.0.2/aapt" version
           "$ANDROID_HOME/build-tools/34.0.0/aapt" version
+          ls -la "$ANDROID_HOME/build-tools/33.0.2" | head
           ls -la "$ANDROID_HOME/build-tools/34.0.0" | head
+          ls -la "$ANDROID_HOME/platforms/android-33/android.jar"
           ls -la "$ANDROID_HOME/platforms/android-34/android.jar"
 
       - name: Create debug keystore
@@ -94,7 +101,7 @@ EOF2
           test -f project.godot
           test -f export_presets.cfg
           test -f main.tscn
-          grep -E 'name="Android Debug"|gradle_build/use_gradle_build=false' export_presets.cfg
+          grep -E 'name="Android Debug"|gradle_build/use_gradle_build=true|gradle_build/min_sdk="23"|gradle_build/target_sdk="34"' export_presets.cfg
           godot --headless --path . --editor --quit
 
       - name: Export Android debug APK
@@ -108,7 +115,7 @@ EOF2
           export GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD="android"
           mkdir -p build/android
           echo "SDK: $GODOT_ANDROID_SDK_PATH"
-          ls -d "$ANDROID_HOME/platforms/android-34" "$ANDROID_HOME/build-tools/34.0.0"
+          ls -d "$ANDROID_HOME/platforms/android-33" "$ANDROID_HOME/build-tools/33.0.2" "$ANDROID_HOME/platforms/android-34" "$ANDROID_HOME/build-tools/34.0.0"
           godot --headless --path . --verbose --export-debug "Android Debug" build/android/TEGARIS82-FIGHT-debug.apk
           test -s build/android/TEGARIS82-FIGHT-debug.apk
           ls -lh build/android/TEGARIS82-FIGHT-debug.apk
