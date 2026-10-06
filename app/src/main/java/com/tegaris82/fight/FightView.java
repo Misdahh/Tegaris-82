@@ -35,7 +35,10 @@ public class FightView extends View {
     private int profileLevel = 1, profileWins = 0, profileFights = 0;
     private MediaPlayer menuMusic;
     private SoundPool soundPool;
-    private int sndPunch = 0, sndHit = 0, sndSkill = 0;
+    private Bitmap heroGarisRealistic;
+    private Bitmap menuRosterBackground;
+    private final Bitmap[] realisticHeroes = new Bitmap[17];
+    private int sndPunch = 0, sndHit = 0, sndSkill = 0, sndWhoosh = 0, sndImpact = 0, sndBlock = 0, sndHurtMale = 0, sndHurtFemale = 0;
     private int[] outfitChoice = new int[17];
     private final int[] baseAccent = new int[17];
     private final int[] baseDark = new int[17];
@@ -82,6 +85,15 @@ public class FightView extends View {
         setFocusable(true);
         for (int i=0;i<chars.length;i++) { baseAccent[i]=chars[i].accent; baseDark[i]=chars[i].dark; }
         initAudio();
+        heroGarisRealistic = BitmapFactory.decodeResource(getResources(), R.drawable.hero_garis_realistic);
+        menuRosterBackground = BitmapFactory.decodeResource(getResources(), R.drawable.tegaris82_roster_background);
+        int[] heroIds = {
+            R.drawable.hero_garis, R.drawable.hero_tega, R.drawable.hero_nova, R.drawable.hero_blaze,
+            R.drawable.hero_shadow, R.drawable.hero_titan, R.drawable.hero_raven, R.drawable.hero_vortex,
+            R.drawable.hero_phantom, R.drawable.hero_fury, R.drawable.hero_storm, R.drawable.hero_zero,
+            R.drawable.hero_kira, R.drawable.hero_axel, R.drawable.hero_mira, R.drawable.hero_rex, R.drawable.hero_misdah
+        };
+        for (int i=0;i<heroIds.length;i++) realisticHeroes[i] = BitmapFactory.decodeResource(getResources(), heroIds[i]);
     }
 
     private void initAudio() {
@@ -89,14 +101,23 @@ public class FightView extends View {
             menuMusic = MediaPlayer.create(getContext(), com.tegaris82.fight.R.raw.menu_music);
             if (menuMusic != null) { menuMusic.setLooping(true); if (musicOn) menuMusic.start(); }
             AudioAttributes aa = new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
-            soundPool = new SoundPool.Builder().setMaxStreams(4).setAudioAttributes(aa).build();
+            soundPool = new SoundPool.Builder().setMaxStreams(8).setAudioAttributes(aa).build();
             sndPunch = soundPool.load(getContext(), R.raw.punch, 1);
             sndHit = soundPool.load(getContext(), R.raw.hit, 1);
             sndSkill = soundPool.load(getContext(), R.raw.skill, 1);
+            sndWhoosh = soundPool.load(getContext(), R.raw.whoosh, 1);
+            sndImpact = soundPool.load(getContext(), R.raw.body_hit, 1);
+            sndBlock = soundPool.load(getContext(), R.raw.block, 1);
+            sndHurtMale = soundPool.load(getContext(), R.raw.hurt_male, 1);
+            sndHurtFemale = soundPool.load(getContext(), R.raw.hurt_female, 1);
         } catch (Exception ignored) {}
     }
 
-    private void playSfx(int id) { if (sfxOn && soundPool != null && id != 0) soundPool.play(id,1,1,1,0,1); }
+    private void playSfx(int id) { playSfx(id, 1f); }
+    private void playSfx(int id, float volume) {
+        if (sfxOn && soundPool != null && id != 0) soundPool.play(id,volume,volume,1,0,1);
+    }
+    private void playHurt(boolean female) { playSfx(female ? sndHurtFemale : sndHurtMale, 0.82f); }
     private void applyOutfit(int idx, int outfit) {
         outfitChoice[idx]=outfit;
         int[] colors=outfitColors(idx,outfit); chars[idx].accent=colors[0]; chars[idx].dark=colors[1];
@@ -105,6 +126,9 @@ public class FightView extends View {
     @Override protected void onDetachedFromWindow() {
         if(menuMusic!=null){ try{menuMusic.stop();}catch(Exception ignored){} menuMusic.release(); menuMusic=null; }
         if(soundPool!=null){ soundPool.release(); soundPool=null; }
+        if(heroGarisRealistic!=null){ heroGarisRealistic.recycle(); heroGarisRealistic=null; }
+        if(menuRosterBackground!=null){ menuRosterBackground.recycle(); menuRosterBackground=null; }
+        for(int i=0;i<realisticHeroes.length;i++){ if(realisticHeroes[i]!=null){ realisticHeroes[i].recycle(); realisticHeroes[i]=null; } }
         super.onDetachedFromWindow();
     }
 
@@ -191,6 +215,12 @@ public class FightView extends View {
         // dark temple, giant guardian silhouette, dramatic lightning and large TEGARIS82 branding.
         float w=getWidth(), h=getHeight();
         c.drawColor(0xFF05070B);
+        if(menuRosterBackground!=null){
+            Paint bp=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+            RectF bd=new RectF(0,0,w,h);
+            c.drawBitmap(menuRosterBackground,null,bd,bp);
+            p.setStyle(Paint.Style.FILL); p.setColor(0x9903070C); c.drawRect(0,0,w,h,p);
+        }
         p.setStyle(Paint.Style.FILL);
         p.setColor(0xFF090B12); c.drawRect(0,0,w,h,p);
 
@@ -661,10 +691,64 @@ public class FightView extends View {
     }
 
     private void drawFighter(Canvas c,float x,float y,CharacterInfo ch,boolean facingRight,int pose) {
+        int idx=0;
+        for(int i=0;i<chars.length;i++){ if(chars[i]==ch){ idx=i; break; } }
+        if(idx==0 && heroGarisRealistic!=null){
+            drawRealisticHero(c,x,y,facingRight,pose);
+            return;
+        }
+        if(idx>=0 && idx<realisticHeroes.length && realisticHeroes[idx]!=null){
+            drawRealisticRosterHero(c,x,y,realisticHeroes[idx],facingRight,pose,ch.accent);
+            return;
+        }
         drawAnimatedHuman(c,x,y,ch,1.65f,facingRight,pose);
         drawMartialOutfit(c,x,y,ch,1.65f,facingRight);
         if ("MISDAH".equals(ch.name)) drawMisdahGear(c,x,y,1.15f,facingRight);
         drawCharacterDetails(c,x,y,ch,1.65f,facingRight);
+    }
+
+    private void drawRealisticRosterHero(Canvas c,float x,float y,Bitmap bmp,boolean facingRight,int pose,int accent){
+        long now=System.currentTimeMillis();
+        float bob=(float)Math.sin(now/240.0)*2.0f;
+        float attackScale=(pose==2 || pose==3 || pose==5)?1.04f:1.0f;
+        float targetH=Math.min(getHeight()*0.70f,470f)*attackScale;
+        float scale=targetH/bmp.getHeight();
+        float targetW=bmp.getWidth()*scale;
+        RectF dst=new RectF(x-targetW/2f,y-targetH+8+bob,x+targetW/2f,y+8+bob);
+        Paint rp=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+        if(facingRight){ c.drawBitmap(bmp,null,dst,rp); }
+        else { c.save(); c.scale(-1,1,x,0); c.drawBitmap(bmp,null,dst,rp); c.restore(); }
+        p.setStyle(Paint.Style.FILL); p.setColor(0x66000000);
+        c.drawOval(x-targetW*0.34f,y-8,x+targetW*0.34f,y+12,p);
+        p.setColor(accent); c.drawCircle(x,y-targetH+18,4,p);
+    }
+
+    private void drawRealisticHero(Canvas c,float x,float y,boolean facingRight,int pose) {
+        if (heroGarisRealistic == null) return;
+        long now=System.currentTimeMillis();
+        float bob=(float)Math.sin(now/260.0)*2.0f;
+        float attackScale=(pose==2 || pose==3 || pose==5)?1.04f:1.0f;
+        float targetH=Math.min(getHeight()*0.76f, 500f)*attackScale;
+        float scale=targetH/heroGarisRealistic.getHeight();
+        float targetW=heroGarisRealistic.getWidth()*scale;
+        float left=x-targetW/2f;
+        float top=y-targetH+8+bob;
+        RectF dst=new RectF(left,top,left+targetW,top+targetH);
+        Paint rp=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+        if(facingRight) {
+            c.drawBitmap(heroGarisRealistic,null,dst,rp);
+        } else {
+            c.save();
+            c.scale(-1,1,x,0);
+            c.drawBitmap(heroGarisRealistic,null,dst,rp);
+            c.restore();
+        }
+        // Small ground contact shadow keeps the photoreal render anchored in the arena.
+        p.setStyle(Paint.Style.FILL);
+        p.setColor(0x55000000);
+        c.drawOval(x-targetW*0.30f,y-7,x+targetW*0.30f,y+10,p);
+        p.setColor(0x66FF304F);
+        c.drawCircle(x,y-targetH*0.45f,5, p);
     }
 
     // Original, procedural human fighter: head, torso, arms and legs are posed every frame.
@@ -1223,7 +1307,8 @@ public class FightView extends View {
         if(now<playerHitStunUntil) return;
         skillUltimate = ultimate;
         skillFlashUntil = now+420;
-        playSfx(ultimate ? sndSkill : sndPunch);
+        playSfx(sndWhoosh, ultimate ? 0.72f : 0.58f);
+        playSfx(ultimate ? sndSkill : sndPunch, 0.75f);
         if(vibrationOn) vibrate(ultimate ? 35 : 15);
         playerPose = ultimate ? 5 : (dmg>=15 ? 5 : (dmg>=10 ? 3 : 2));
         playerPoseUntil = now + (ultimate ? 520 : 340);
@@ -1254,12 +1339,15 @@ public class FightView extends View {
             enemyHP=Math.max(0,enemyHP-2);
             energy=Math.min(100,energy+12);
             damage(clashX,clashY-25,2,true);
+            playSfx(sndBlock, 0.9f);
             spawnImpact(clashX,clashY,0xFFFFC107);
             return;
         }
 
         enemyHP=Math.max(0,enemyHP-dmg);
-        playSfx(sndHit);
+        playSfx(sndImpact, 1.0f);
+        playSfx(sndHit, 0.45f);
+        playHurt((enemy % 5) == 0 || (enemy % 5) == 2);
         if(vibrationOn) vibrate(12);
         combo++; comboUntil=now+900;
         enemyPose=4; enemyPoseUntil=now+260; enemyHitStunUntil=now+260;
@@ -1293,11 +1381,14 @@ public class FightView extends View {
             enemyHP=Math.max(0,enemyHP-2);
             energy=Math.min(100,energy+10);
             damage(clashX,clashY-25,2,true);
+            playSfx(sndBlock, 0.9f);
             spawnImpact(clashX,clashY,0xFFFFC107);
             return;
         }
         playerHP=Math.max(0,playerHP-dmg);
-        playSfx(sndHit);
+        playSfx(sndImpact, 1.0f);
+        playSfx(sndHit, 0.45f);
+        playHurt((selected % 5) == 0 || (selected % 5) == 2);
         if(vibrationOn) vibrate(12);
         playerPose=4; playerPoseUntil=now+260; playerHitStunUntil=now+260;
         playerMoveFrom=playerX;
