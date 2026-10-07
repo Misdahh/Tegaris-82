@@ -47,26 +47,29 @@ jobs:
           mkdir -p "$HOME/.android"
           rm -f "$HOME/.android/debug.keystore"
           keytool -genkeypair -v             -keystore "$HOME/.android/debug.keystore"             -storepass android             -alias androiddebugkey             -keypass android             -keyalg RSA             -keysize 2048             -validity 10000             -dname "CN=Android Debug,O=Android,C=US"
+
           test -s "$HOME/.android/debug.keystore"
 
-      - name: Export Android debug APK
+      - name: Validate Godot project
         shell: bash
         run: |
           set -euo pipefail
+          godot --version
+          test -f project.godot
+          test -f main.tscn
+          test -f export_presets.cfg
+          godot --headless --path . --editor --quit
 
-          export GODOT_ANDROID_KEYSTORE_DEBUG_PATH="$HOME/.android/debug.keystore"
-          export GODOT_ANDROID_KEYSTORE_DEBUG_USER="androiddebugkey"
-          export GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD="android"
-
-          echo "Checking debug keystore..."
-          test -s "$GODOT_ANDROID_KEYSTORE_DEBUG_PATH"
-          test -n "$GODOT_ANDROID_KEYSTORE_DEBUG_USER"
-          test -n "$GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD"
-
+      - name: Export Android debug APK
+        shell: bash
+        env:
+          GODOT_ANDROID_KEYSTORE_DEBUG_PATH: ${{ env.HOME }}/.android/debug.keystore
+          GODOT_ANDROID_KEYSTORE_DEBUG_USER: androiddebugkey
+          GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
+        run: |
+          set -euo pipefail
           mkdir -p build/android
-
           godot --headless             --path .             --export-debug "Android Debug"             build/android/TEGARIS82-FIGHT-debug.apk
-
           test -s build/android/TEGARIS82-FIGHT-debug.apk
           ls -lh build/android/TEGARIS82-FIGHT-debug.apk
 
